@@ -34,9 +34,18 @@ def frange(x,y,jump):
 		x += jump
 
 
-
-
 w = []
+def y(M, x):
+	global w
+	if not w:
+		return False
+	return bigSum(0,M, lambda j: w[j]*x**j)
+
+def error(M,x, t):
+	return bigSum(0, len(x)-1, lambda n: y(M,x[n]) - t[n])**2
+
+def errorRMS(M,x, t):
+	return ( 2*error(M, x, t) / len(x) )**0.5
 
 def genCoef(M, N, x, y): # M is the order, N is number of points, t = training Y, x = training X
 		# N = number of points
@@ -44,7 +53,8 @@ def genCoef(M, N, x, y): # M is the order, N is number of points, t = training Y
 		# Or, if set vars to:
 		# A[i][j] = bigSum(1,N lambda n: w[j]*x[n]**(i+j) )
 		# T[i] = bigSum(1,N, lambda n: t[n]*x**i)
-		
+
+		# THIS IS A PURE LINEAR REGRESSION STYLE OF LEARNING. NO BAYSEIAN OR FREQUENTIST APPROACH
 		global w
 		w = [0 for i in range(M+1)]
 		s = lambda k: bigSum(0, N-1, lambda i:x[i]**k)
@@ -54,7 +64,7 @@ def genCoef(M, N, x, y): # M is the order, N is number of points, t = training Y
 		for i in range(0, M+1):
 			sA.append([ S[ii] for ii in range(i,M+i+1) ])
 		sA = numpy.array(sA)
-		      
+			  
 		t = lambda k: bigSum(0, N-1, lambda i: y[i]*x[i]**k)
 		T = numpy.array([ t(ii) for ii in range(0,M+1) ])
 		
@@ -63,47 +73,82 @@ def genCoef(M, N, x, y): # M is the order, N is number of points, t = training Y
 			w[i] = results[i]
 				
 def Main():
+	global w
+	
 	xSin = []
 	ySin = []
 
 	xMachine= []
 	yMachine= []
-	
+
 	xPredict = []
 	yPredict = []
+	
+	xTest = []
+	yTest = []
 
 	i=0.00
 	end= (pi*2)
 
-	func = lambda x : sin(x)
+	func = lambda x : 10*sin(x)
 
 	while i <= end: # Plots the SIN curve
 		xSin.append(i)
 		ySin.append(func(i))
 		i+=0.01
 
-	for g in frange(0.0,6.5, 0.6): # Random points along the curve generated
-		rand = (-1)**int(random()*10) * int(random()*2)
+	for g in frange(0.0,6.5, 0.1): # Random points along the curve generated
+		rand = (-1)**int(random()*10) * (random()*2)
 		xMachine.append(g) # stores randomness x
 		yMachine.append(rand + func(g)) # stores the randomness y
 
+	'''for t in frange(0.0, 6.5, 0.5):
+		rand = (-1)**int(random()*10) * int(random()*2)
+		xTest.append(g) # stores randomness x
+		yTest.append(rand + func(t)) # stores the randomness y
+		'''
+
 
 	N = len(xMachine)
-	M = N
+	M = 3
 	genCoef(M,N, xMachine, yMachine)
 
 	for i in frange(0.0,xSin[-1], 0.01):
 		xPredict.append(i)
-		pred = bigSum(0,M, lambda j: w[j]*i**j)
+		pred = y(M,i)
 		yPredict.append( pred )
 
-		
-	#print(w)
-	
 	plt.axis([-0.5,end+0.5,-4,4])
 	plt.plot(xSin,ySin)
 	plt.plot(xPredict, yPredict)
 	plt.scatter(xMachine,yMachine)
+
+	miniOrd = -1
+	miniErr = 10**9
+	for M in range(0,20):
+		genCoef(M,N,xMachine,yMachine)
+		cur = errorRMS(M,xMachine, yMachine)
+		if cur < miniErr:
+			miniOrd = M
+		miniErr = min(cur, miniErr)
+		print("Error of order ",M," is ",cur)
+
+	print("The lowest value of error for M is", miniOrd)
+
+	xMin = []
+	yMin = []
+
+	genCoef(miniOrd, N, xMachine, yMachine)
+	for i in frange(0.0, 6.3, 0.1):
+		xMin.append(i)
+		yMin.append(y(miniOrd, i))
+	plt.plot(xMin, yMin)
+			    
+		
+	
+	#print(w)
+	
+	
 
 	plt.show()
 
