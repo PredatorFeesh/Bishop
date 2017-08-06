@@ -42,7 +42,7 @@ def y(M, x):
 	return bigSum(0,M, lambda j: w[j]*x**j)
 
 def error(M,x, t):
-	return bigSum(0, len(x)-1, lambda n: y(M,x[n]) - t[n])**2
+	return bigSum(0, len(x)-1, lambda n: (y(M,x[n]) - t[n])**2 )
 
 def errorRMS(M,x, t):
 	return ( 2*error(M, x, t) / len(x) )**0.5
@@ -97,7 +97,7 @@ def Main():
 		ySin.append(func(i))
 		i+=0.01
 
-	for g in frange(0.0,6.5, 0.1): # Random points along the curve generated
+	for g in frange(0.0,6.5, 0.05): # Random points along the curve generated
 		rand = (-1)**int(random()*10) * (random()*2)
 		xMachine.append(g) # stores randomness x
 		yMachine.append(rand + func(g)) # stores the randomness y
@@ -118,14 +118,14 @@ def Main():
 		pred = y(M,i)
 		yPredict.append( pred )
 
-	plt.axis([-0.5,end+0.5,-4,4])
+	#plt.axis([-0.5,end+0.5,-4,4])
 	plt.plot(xSin,ySin)
 	plt.plot(xPredict, yPredict)
 	plt.scatter(xMachine,yMachine)
 
 	miniOrd = -1
-	miniErr = 10**9
-	for M in range(0,20):
+	miniErr = 10**15
+	for M in range(0,N):
 		genCoef(M,N,xMachine,yMachine)
 		cur = errorRMS(M,xMachine, yMachine)
 		if cur < miniErr:
