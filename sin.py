@@ -1,5 +1,5 @@
 from matplotlib import pyplot as plt
-from math import sin, pi, ceil
+from math import sin, pi, ceil, exp
 from random import random
 import numpy
 from scipy import linalg
@@ -32,6 +32,19 @@ def frange(x,y,jump):
 	while x < y:
 		yield x
 		x += jump
+
+#BEGIN GAUSS FUNCTIONS
+#Working
+def mean(x):
+	n = len(x)
+	return (1/n)*bigSum(0,n-1,lambda i: x[i]  )
+def variance(x):
+	n = len(x)
+	return ((1/(n-1))*bigSum(0,n-1, lambda i: (x[i]-mean(x))**2))
+def gauss(x, t):
+	sig = variance(t)
+	return (1/(2*pi*sig)**0.5)*exp(-(1/(2*sig**2)*(x-mean(t))**2))
+#END GAUSS
 
 
 w = []
