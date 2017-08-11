@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #BEGIN GAUSS FUNCTIONS
 #Working
-from mathextended import bigSum
+from utils.mathextended import bigSum
 from math import pi, exp
 
 def mean(x):

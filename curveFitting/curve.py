@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #from utils.gauss import gauss
 from utils.mathextended import bigSum
+from utils.gauss import *
 import numpy
 
 w = []
